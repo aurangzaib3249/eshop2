@@ -1,0 +1,10 @@
+<div class="modal-body">
+    {% for field in form.visible_fields %}
+    <div class="form-group">
+        <label>{{field.label}}</label>
+        {{field}}
+    </div>
+    {% endfor %}					
+    {{form.store}}
+    <input type="text" name="productId" value="{{productId}}" hidden> 
+</div>

@@ -1,0 +1,23 @@
+<div id="create_group" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form action="/create_group" method="post">
+				{% csrf_token %}
+				<div class="modal-header">						
+					<h4 class="modal-title">Edit Product</h4>
+					<button type="button" class="close" onclick="CloseModel('#create_group')" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div id="container">
+					<input type="text" name="group_name" placeholder="Enter Group Name,Group name must be unique" class="form-control" id="">
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" onclick="CloseModel('#create_group')" value="Cancel">
+					<input type="submit" class="btn btn-info" value="Create Group">
+				</div>
+				
+				
+				
+			</form>
+		</div>
+	</div>
+</div>

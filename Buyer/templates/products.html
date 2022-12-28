@@ -1,0 +1,170 @@
+{% extends 'BuyerBase.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block style %}
+    <link rel="stylesheet" href={% static 'css/products.css' %}>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"
+          rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/starability-fade.min.css"/>
+    <style></style>
+{% endblock style %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-2 mt-1">
+            <div class=" container">
+                <div class="">
+                    <div class="sidebar">
+                        <div class="mini-submenu">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </div>
+                        <div class="list-group">
+                            <span href="#" class="list-group-item  " style="background:#0b7a73;color:white">
+                                Quick Search
+                                
+                            </span>
+                            {% for cate in categories %}
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <input type="text" name="search" value='{{cate}}' id="" hidden>
+                                <a href="#" class="list-group-item categories" onclick="this.parentNode.submit();">
+                                    {{cate}}
+                               </a>
+                              
+                             </form>
+                            
+                            {% endfor %}
+                            {% if count %}
+                            <a href={% url 'buyer_products' %} class="list-group-item ">Clear Filter
+                                <span>Count:{{ count }}</span>
+                           
+                           </a>
+                           {% endif %}
+                           
+                           
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <div class="col-md-10">
+    <div class="card">
+        <div class="card-body">
+            <div class="container-fluid">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                   
+                                </div>
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" placeholder="Search.." name="search">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="form-control">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="container-fluid mt-1">
+                <div class="row">
+                    {% for item in products %}
+                        <div class="col-xs-4 col-md-4">
+                           
+                            <!-- First product box start here-->
+                            <div class="prod-info-main prod-wrap clearfix " style="width:100%">
+                                <div class="row">
+                                    <div class="col-md-5 col-sm-12 col-xs-12">
+                                        <div class="product-image">
+                                            <img src="/media/{{ item.image }}" width="400" height="250">
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 col-xs-12">
+                                        <div class="product-deatil">
+                                            <h5 class="name">
+                                                <a href={% url 'product_detail' item.id %}>{{ item.product_name }}</a>
+                                                <a href={% url 'store_details' item.store.id %}>
+                                                    <span>{{ item.store.store_name }} Store {{ item.store.is_open }}</span>
+                                                    
+                                                </a>
+                                                <span>{{ item.product_category }}</span>
+                                            </h5>
+                                            <p class="price-container">
+                                                <span>${{ item.get_price }}</span>
+                                            </p>
+                                            <span class="tag1"></span>
+                                        </div>
+                                        <div class="description text-wrap">
+                                            <p >{{ item.product_desc }}</p>
+                                        </div>
+                                        <div class="product-info">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    {% check_in_userWishlist request.user.id item.id   as bookmark_object %}
+                                                    {% if bookmark_object %}
+                                                        <button class="like btn btn-default"
+                                                                style="color:red"
+                                                                id="wishlist{{item.id}}"
+                                                                onclick="AddTOWIshList({{ item.id }})"
+                                                                type="button">
+                                                            <span class="fa fa-heart" ></span>
+                                                        </button>
+                                                    {% else %}
+                                                        <button class="like btn "
+                                                                style="color:green"
+                                                                
+                                                                id="wishlist{{item.id}}" onclick="Remove_from_WishList({{item.id}})"
+                                                                type="button">
+                                                            <span class="fa fa-heart"></span>
+                                                        </button>
+                                                    {% endif %}
+                                                    <button onclick="AddTOCart('{{item.id}}')" class="btn btn-danger">Add to cart</button>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <fieldset class="starability-result mx-auto"
+                                                              data-rating="{{ item.store_rating }}">
+                                                    </fieldset>
+                                                    <div class="rating">
+                                                        Rating:
+                                                        {{ item.get_rating_stars }}
+                                                        
+                                                    </div>
+                                                    <span><a href={% url 'chat_with_groups' item.store.store_owner.get_group %}>Join Room {{item.store.store_owner.get_group}}</a></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- end product -->
+                         
+                        </div>
+                        {% endfor %}
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock content %}
+{% block script %}
+   
+{% endblock script %}

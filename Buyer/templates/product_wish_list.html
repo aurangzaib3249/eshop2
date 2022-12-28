@@ -1,0 +1,81 @@
+{% extends 'BuyerBase.html' %}
+{% load static %}
+{% block style %}
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href={% static 'css/wishlist.css' %}>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+rel="stylesheet"/>
+
+{% endblock style %}
+
+<!------ Include the above in your HEAD tag ---------->
+
+{% block content %}
+
+
+	<div class="cart-wrap">
+		<div class="container">
+	        <div class="row">
+			    <div class="col-md-12">
+			        <div class="main-heading mb-10">My wishlist</div>
+			        <div class="table-wishlist">
+				        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+				        	<thead>
+					        	<tr>
+					        		<th width="45%">Product Name</th>
+					        		<th width="15%">Unit Price</th>
+					        		<th width="15%">Stock Status</th>
+					        		<th width="15%">Action</th>
+					        	
+					        	</tr>
+					        </thead>
+					        <tbody>
+                                {% for item in products %}
+					        	<tr>
+					        		<td width="45%">
+					        			<div class="display-flex align-center">
+		                                    <div class="img-product">
+                                                
+		                                        <img src="/media/{{item.product.image}}"  alt="" class="mCS_img_loaded">
+		                                    </div>
+		                                    <div class="name-product">
+		                                        {{item.product.product_name}}
+		                                    </div>
+	                                    </div>
+	                                </td>
+					        		<td width="15%" class="price">${{item.product.get_price}}</td>
+                                    {% if item.get_stock_status %}
+                                        <td width="15%"><a href= '{% url 'addCart' item.id %}'><p class="round-black-btn small-btn"  >Add to Cart</p></a> </td>
+                                        
+
+                                    {% else %}
+                                    <td width="15%"> <button class="round-black-btn small-btn" >Out of Stock</button></td>
+                                   
+                                    {% endif %}
+					        		<td width="10%" class="text-center"><a href={% url 'wishlist_item_remove' item.id %}  class="trash-icon"><i class="far fa-trash-alt"></i></a></td>
+					        		
+					        		
+					        	</tr>
+					        	{% endfor %}
+					        	
+				        	</tbody>
+				        </table>
+				    </div>
+			    </div>
+			</div>
+		</div>
+	</div>
+
+
+{% endblock content %}
+
+
+{% block script %}
+
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock script %}

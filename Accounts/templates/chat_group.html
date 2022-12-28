@@ -1,0 +1,342 @@
+{% extends template %}
+{% load custom_tags %}
+{% load static %}
+{% load humanize %}
+{% block style %}
+    <link rel="stylesheet" href={% static 'css/chat1.css' %}>
+    <link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          type="text/css"
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+{% endblock style %}
+{% block content %}
+
+        <div class="container-fluid mt-3" style="">
+            <div class="row clearfix">
+                <div class="card">
+                    <div class="row ">
+                        <div class="col-md-3" style="background:#3b3e49;">
+                            <div id="plist" class="people-list">
+                                <div class="input-group">
+                                    <div class="input-group-prepend"></div>
+                                </div>
+                                <ul class="list-unstyled chat-list mt-2 mb-0">
+                                    {% for grp in groups %}
+                                        <li class="clearfix">
+                                            <a href=
+                                               {% url 'chat_with_groups' grp.group.group_name %}
+                                               id=""
+                                               style="text-decoration;none;color:white">
+                                                <img src="https://bootdey.com/img/Content/avatar/avatar8.png" alt="avatar">
+                                                <div class="about">
+                                                    <div class="name">{{ grp.group.group_name }}</div>
+                                                    <div class="status"  style="text-decoration;none;color:white">Users:{{ grp.group.count_users }}</div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                    {% for con in conversations %}
+                                        {% if con.seller == request.user %}
+                                            <li class="clearfix">
+                                                <a href=
+                                                   {% url 'chat_with' con.buyer.chat_name %}
+                                                   id="chat_with_id{{ con.buyer.id }}"
+                                                   style="text-decoration;none;color:white">
+                                                   {% if con.buyer.avatar %}
+                                                   <img src='/media/{{con.buyer.avatar}}' alt="avatar">
+                                                    {% else %}
+                                                   <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+                                                   {% endif %}
+                                                    <div class="about">
+                                                        <div class="name">{{ con.buyer.email }}</div>
+                                                        <div class="status"
+                                                             id="user_status{{ con.buyer.id }}"
+                                                             style="text-decoration;none;color:white">
+                                                            <i class="fa fa-circle {{ con.buyer.status|to_lower }}"></i> {{ con.buyer.status }}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="clearfix">
+                                                <a href=
+                                                   {% url 'chat_with' con.seller.chat_name %}
+                                                   id="chat_with_id{{ con.seller.id }}"
+                                                   style="text-decoration;none;color:white">
+                                                   {% if con.seller.avatar %}
+                                                        <img src='/media/{{con.seller.avatar}}' alt="avatar">
+                                                         {% else %}
+                                                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+                                                        {% endif %}
+                                                   
+                                                    <div class="about">
+                                                        <div class="name">{{ con.seller.email }}</div>
+                                                        <div class="status"
+                                                             id="user_status{{ con.seller.id }}"
+                                                             style="text-decoration;none;color:white">
+                                                            <i class="fa fa-circle {{ con.seller.status|to_lower }}"></i> {{ con.seller.status }}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="chat">
+                                <div class="chat-header clearfix">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <a href="javascript:void(0);"
+                                               data-toggle="modal"
+                                               data-target="#view_info">
+                                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                                            </a>
+                                            <div class="chat-about">
+                                                <h6 class="m-b-0">{{ chat_with }}</h6>
+                                                <span>Store:{{ chat_with.store.store_name }}</span>
+                                                <div class="status" id="chat_with{{ chat_with.id }}">
+                                                    <i class="fa fa-circle online" id="onlineUsers">Online Users: {{ chat_with.get_users_statues.0 }}</i>
+                                                    <i class="fa fa-circle offline" id="offlineUsers">Offline Users {{ chat_with.get_users_statues.1 }}</i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% if chat_with.store.store_owner == request.user or request.user in chat_with.get_admins %}
+                                            <div class="col-lg-6 hidden-sm text-right">
+                                                <a onclick="OpenModel('#addUsers')" class=" btn btn-outline-success "><i class="fa fa-circle gonline">Online Users</i></a>
+                                                <a onclick="OpenModel('#offlineUser')" class="btn btn-outline-danger"><i class="fa fa-times">Online Users</i></a>
+                                            </div>
+                                        {% endif %}
+                                        {% if request.user.user_type == "Seller" %}
+                                            <div class="col-lg-6 hidden-sm text-right">
+                                                {% if  not request.user.get_group %}
+                                                    <a onclick="OpenModel('#create_group')" class="btn btn-outline-warning">Create Group<i class="fa fa-plus"></i></a>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="chat-history" style="height:500px;background:#eff3f7;">
+                                    <ul class="" id="message_box" style="height:100%; overflow-x: scroll">
+                                        <center id="first_time_text">
+                                            <h1>New Conversation</h1>
+                                            <p>Chat with users</p>
+                                        </center>
+                                        {% for msg in group_messages %}
+                                            {% if msg.sender.user == request.user %}
+                                                <li class="clearfix">
+                                                    
+                                                    <div class="message-data text-right">
+                                                        <span class="message-data-time">{{ msg.date|naturaltime }}</span>
+                                                        {% if msg.sender.avatar %}
+                                                        <img src='/media/{{msg.sender.avatar}}' alt="avatar">
+                                                         {% else %}
+                                                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+                                                        {% endif %}
+                                                        <span>{{ msg.sender.user }}</span>
+                                                    </div>
+                                                   
+                                                    <div class="message other-message float-right">{{ msg.message }}
+                                                        
+                                                    </div>
+                                                   
+                                                </li>
+                                            {% else %}
+                                                <li class="clearfix">
+                                                    <div class="message-data">
+                                                        {% if msg.sender.avatar %}
+                                                        <img src='/media/{{msg.sender.avatar}}' alt="avatar">
+                                                         {% else %}
+                                                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+                                                        {% endif %}
+                                                        <span class="message-data-time">{{ msg.date|naturaltime }}</span>
+                                                        <span>{{ msg.sender.user }}
+                                                                {% if msg.sender_is_admin %}
+                                                            <br><span class="badge badge-primary">Admin</span>
+                                                            {% endif %}
+                                                        </span>
+                                                        
+                                                    </div>
+                                                    <div class="message my-message">{{ msg.message }}</div>
+                                                    <i class="fa-solid fa-message-check"></i>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="chat-message clearfix">
+                                    <div class="input-group mb-0">
+                                        <input id="chat-message-input" type="text" size="100">
+                                        <div class="input-group-prepend">
+                                            <span id="chat-message-submit"
+                                                  class="input-group-text"
+                                                  style="pointer:pointer"><i class="fa fa-send"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include "group_model.html" %}
+        {% if group_id %}
+        
+            <script>
+                $("#message_box").animate({
+                    "scrollTop": $("#message_box").scrollTop() + 5000
+                });
+                const roomName = "{{group_id}}"
+                var protocols = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
+                const chatSocket = new WebSocket(
+                    protocols +
+                    window.location.host +
+                    '/ws/group/' +
+                    roomName +
+                    '/'
+                );
+                
+                // onmessage - An event listener to be called when a message is received from the server.
+                chatSocket.onmessage = function(e) {
+                    // JSON.parse() converts the JSON object back into the original object,
+                    // then examine and act upon its contents.
+                    const data = JSON.parse(e.data);
+                    console.log(data)
+                
+                    if (data.sender == '{{request.user.id}}') {
+                        res = '<li class="clearfix"><div class="message-data text-right"><span class="message-data-time">' + data.date_time + '</span><img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar"></div><div class="message other-message float-right">' + data.message + '</div></li>'
+                    } else {
+                        var res = ' <li class="clearfix"><div class="message-data"><img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar"><span class="message-data-time">' + data.date_time + '</span></div><div class="message my-message">' + data.message + '</div></li>'
+                    }
+                
+                
+                    var hist = $("#message_box").html()
+                
+                    hist = hist + res
+                    $("#message_box").html(hist)
+                    $("#message_box").animate({
+                        "scrollTop": $("#message_box").scrollTop() + 1050
+                    });
+                
+                
+                
+                };
+                
+                // onclose - An event listener to be called when the connection is closed.
+                chatSocket.onclose = function(e) {
+                    console.error('Chat socket closed unexpectedly');
+                };
+                
+                document.querySelector('#chat-message-input').focus();
+                document.querySelector('#chat-message-input').onkeyup = function(e) {
+                    if (e.keyCode === 13) { // enter, return
+                        document.querySelector('#chat-message-submit').click();
+                    }
+                };
+                
+                
+                document.querySelector('#chat-message-submit').onclick = function(e) {
+                    const messageInputDom = document.querySelector('#chat-message-input');
+                    const message = messageInputDom.value;
+                    if (message != "") {
+                        chatSocket.send(JSON.stringify({
+                            'message': message
+                        }));
+                    }
+                
+                    // Send the msg object as a JSON-formatted string.
+                
+                
+                    // Blank the text input element, ready to receive the next line of text from the user.
+                    messageInputDom.value = '';
+                    document.querySelector('#chat-message-input').focus();
+                };
+            </script>
+        {% endif %}
+
+        <div id="addUsers" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Online Users</h4>
+                        <button type="button"
+                                class="close"
+                                onclick="CloseModel('#addUsers')"
+                                data-dismiss="modal"
+                                aria-hidden="true">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="container bootstrap snippets bootdey">
+                        <div class="jumbotron" style="min-height:400px;height:auto;">
+                            <ul class="list-group">
+                                {% for user in chat_with.get_users_statues.2 %}
+                                    {% if request.user.chat_name != user.user.chat_name %}
+                                        <li class="list-group-item user-item text-left">
+                                            <img class="img-circle img-user img-thumbnail "
+                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                                            <h3>
+                                                <a href={% url 'chat_with' user.user.chat_name %}>{{ user.user.chat_name }}</a>
+                                                <br>
+                                            </h3>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+
+        <div id="offlineUser" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Offline Users</h4>
+                        <button type="button"
+                                class="close"
+                                onclick="CloseModel('#offlineUser')"
+                                data-dismiss="modal"
+                                aria-hidden="true">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="container bootstrap snippets bootdey">
+                        <div class="jumbotron" style="min-height:400px;height:auto;">
+                            <ul class="list-group">
+                                {% for user in chat_with.get_users_statues.3 %}
+                                    {% if request.user.chat_name != user.user.chat_name %}
+                                        <li class="list-group-item user-item text-left">
+                                            <img class="img-circle img-user img-thumbnail "
+                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                                            <h3>
+                                                <a href={% url 'chat_with' user.user.chat_name %}>{{ user.user.chat_name }}</a>
+                                                <br>
+                                            </h3>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <script>
+            function OpenModel(id) {
+                $(id).modal('show');
+            }
+            
+            function CloseModel(id) {
+                $(id).modal('hide');
+            }
+        </script>
+    {% endblock content %}

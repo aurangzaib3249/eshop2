@@ -1,0 +1,311 @@
+{% extends "SellerBase.html" %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href={% static 'css/table.css' %}>
+<link rel="stylesheet" href={% static 'css/model.css' %}>
+
+{% endblock style %}
+{% block content %}
+<input type="text" hidden id="csrf_token" value='{{csrf_token}}'>
+<div class="container-fluid">
+	<div class="table-responsive">
+		<div class="table-wrapper">
+			<div class="table-title">
+				<div class="row">
+					<div class="col-sm-6">
+						<h2>Manage <b>Products <span></span></b></h2>
+						<p>Total Products:{{products.count}}</p>
+					</div>
+					
+					<div class="col-sm-6">
+						<a href="#addProductsModel" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Product</span></a>
+					</div>
+				</div>
+			</div>
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						
+						<th>Product Name</th>
+						<th>Category</th>
+						<th>Description</th>
+						<th>Sale Price</th>
+						<th>Discounted Price</th>
+						<th>Remaining Qty</th>
+						<th>Is Available</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					
+					{% for product in products %}
+					
+					<tr>
+						<td>{{product.product_name}}</td>
+						<td>{{product.product_category}}</td>
+						<td>{{product.product_desc}}</td>
+						<td>{{product.sale_price}}</td>
+						<td>{{product.discounted_price}}</td>
+						<td>{{product.remaining_quantity}}</td>
+						
+						<td>{{product.get_product_status}}</td>
+						<td>
+							<a style="cursor: pointer;"  onclick="EditProduct('#editEmployeeModal','{{product.id}}')" class="edit" ><i class="material-icons"  title="Edit">&#xE254;</i></a>
+							<!--<a href="#editEmployeeModal" onclick="EditProduct(#editEmployeeModal,'{{product.id}})'" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>-->
+							<a href="#deleteProductsModel" onclick="set_id_to_delete('{{product.id}}')" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+						</td>
+					</tr>
+					{% endfor %}
+					
+					
+										
+					
+				</tbody>
+			</table>
+
+			<div class="clearfix">
+				<div class="hint-text">Showing <b>{{ products.number }} </b> out of <b>{{ products.paginator.num_pages }}</b> entries</div>
+				<ul class="pagination">
+					{% if products.has_previous %}
+						<li class="page-item disabled"><a href="?page={{ products.previous_page_number }}">Previous</a></li>
+					{% endif %}
+					
+					{% for j in products.paginator.page_range%}
+					<li class="page-item {% if j == page_number %} active{% endif %}"></li>
+					
+					
+					<li class="page-item"><a href="?page={{ j }}" class="page-link">{{j}}</a></li>
+					{% endfor %}
+					
+					
+					
+					{% if products.has_next %}
+						<li class="page-item"><a href="?page={{ products.next_page_number }}" class="page-link">Next</a></li>
+						
+					{% endif %}
+					
+				</ul>
+
+				
+			</div>
+
+
+
+
+
+
+			
+			
+			
+		</div>
+	</div>        
+</div>
+<!-- Edit Modal HTML -->
+<div id="addProductsModel" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form action="" method="post">
+				{% csrf_token %}
+				<div class="modal-header">						
+					<h4 class="modal-title">Add Product</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">
+					{% for field in form.visible_fields %}
+					<div class="form-group">
+						<label>{{field.label}}</label>
+						{{field}}
+					</div>
+					{% endfor %}					
+					{{form.store}}
+									
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<input type="submit" class="btn btn-success" value="Add">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- Edit Modal HTML -->
+<div id="editEmployeeModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form action="manage_product" method="post">
+				{% csrf_token %}
+				<div class="modal-header">						
+					<h4 class="modal-title">Edit Product</h4>
+					<button type="button" class="close" onclick="CloseModel('#editEmployeeModal')" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div id="productEidtformByid">
+
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" onclick="CloseModel('#editEmployeeModal')" value="Cancel">
+					<input type="submit" class="btn btn-info" value="Update">
+				</div>
+				
+				
+				
+			</form>
+		</div>
+	</div>
+</div>
+<!-- Delete Modal HTML -->
+<div id="deleteProductsModel" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">						
+					<h4 class="modal-title">Delete Employee</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">					
+					<p>Are you sure you want to delete these Records?</p>
+					<p class="text-warning"><small>This action cannot be undone.</small></p>
+					<input type="text" hidden id="delete_product_id">
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<input type="submit" class="btn btn-danger" id="call_delete_request" value="Delete">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+	function OpenModel(id)
+	{
+		$(id).modal('show');
+	}
+	function CloseModel(id)
+	{
+		$(id).modal('hide');
+	}
+	function EditProduct(id,productid)
+	{
+		
+	
+
+		if (productid)
+		{
+			$.ajax({
+				type: 'get',
+				url: "manage_product",
+				data: {"id": productid,
+			},
+			
+				success: function (response) {
+					console.log(response)
+					if (response["status"]===200)
+					{
+						var html=response["form"]
+						$("#productEidtformByid").html(html)
+						OpenModel(id)
+					}
+					
+					
+				},
+				error: function (response) {
+					console.log(response)
+					showMessage('error',response["msg"])
+					
+					$('#deleteProductsModel').modal('toggle');
+				}
+			})
+			
+
+		}
+		
+		OpenModel(id)
+		
+		
+		console.log(id,productid)
+	}
+	function refresh() {    
+		setTimeout(function () {
+			location.reload()
+		}, 500);
+	}
+	function getCookie(name) {
+		let cookieValue = null;
+	
+		if (document.cookie && document.cookie !== '') {
+			const cookies = document.cookie.split(';');
+			for (let i = 0; i < cookies.length; i++) {
+				const cookie = cookies[i].trim();
+	
+				// Does this cookie string begin with the name we want?
+				if (cookie.substring(0, name.length + 1) === (name + '=')) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	
+					break;
+				}
+			}
+		}
+	
+		return cookieValue;
+	}
+	
+   function set_id_to_delete(id)
+   {
+	$("#delete_product_id").val(id)
+	console.log($("#delete_product_id").val())
+   }
+   $(document).on('click','#call_delete_request',function(event){
+	event.preventDefault();
+	var id=$("#delete_product_id").val()
+	const csrftoken = getCookie('csrftoken');
+
+		if (id)
+		{
+			$.ajax({
+				type: 'DELETE',
+				url: "manage_products",
+				data: {"id": id,
+			},
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrftoken
+			  },
+				success: function (response) {
+					console.log(response)
+					if(!response["valid"]){
+						if (response["valid"]==="Product deleted")
+						{
+							showMessage('success',response["msg"])
+							CloseModel('#deleteProductsModel')
+							
+							refresh()
+						}
+						else{
+							showMessage('info',response["msg"])
+							CloseModel('#deleteProductsModel')
+						}
+
+					}
+					
+				},
+				error: function (response) {
+					console.log(response)
+					showMessage('error',response["msg"])
+					
+					CloseModel('#deleteProductsModel')
+				}
+			})
+			
+
+		}
+		
+  });
+  
+</script>
+
+
+{% endblock script %}

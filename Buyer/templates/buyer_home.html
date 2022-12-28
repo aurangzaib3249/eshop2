@@ -1,0 +1,228 @@
+{% extends "BuyerBase.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block style %}
+<link rel="stylesheet" href={% static 'css/home.css' %}>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+{% endblock style %}
+{% block content %}
+
+
+
+ <!-- Carousel Start -->
+ <div class="container-fluid p-0 mb-5">
+	<div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+
+			<!-- Carousel indicators -->
+			<ol class="carousel-indicators">
+
+				<li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+				{% for item in recent_products|slice:"1:" %}
+                <li data-target="#header-carousel"  data-slide-to="{{forloop.counter}}"></li>
+
+                {%endfor%}
+				
+			</ol>   
+
+		<div class="carousel-inner">
+			<div class="carousel-item active">
+			{% for item in recent_products %}
+			
+			
+				<img class="w-100" src="/media/{{item.image}}" alt="Image">
+				<div class="carousel-caption">
+					<div class="container">
+						<div class="row justify-content-center">
+							<div class="col-lg-7 pt-5">
+								<h1 class="display-4 text-white mb-3 animated slideInDown">{{item.product_name}}</h1>
+								<p class="fs-5 text-white-50 mb-5 animated slideInDown">{{item.product_desc}}</p>
+								p
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="carousel-item">	
+					
+						
+			{% endfor %}
+			
+		</div>
+		<button class="carousel-control-prev" type="button" data-bs-target="#header-carousel"
+			data-bs-slide="prev">
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			<span class="visually-hidden"></span>
+		</button>
+		<button class="carousel-control-next" type="button" data-bs-target="#header-carousel"
+			data-bs-slide="next">
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+			<span class="visually-hidden"></span>
+		</button>
+	</div>
+</div>
+
+
+<div class="container-xl mt-5">
+	<div class="row">
+		<div class="col-md-12">
+			<h2>Discounted <b>Products</b></h2>
+			<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="0">
+			<!-- Carousel indicators -->
+			<ol class="carousel-indicators">
+
+				<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+				{% for item in discounted_product|slice:"1:" %}
+                <li data-target="#myCarousel"  data-slide-to="{{forloop.counter}}"></li>
+
+                {%endfor%}
+				
+			</ol>   
+			<!-- Wrapper for carousel items -->
+			<div class="carousel-inner">
+				
+				<div class="item carousel-item active">
+					
+					<div class="row">
+					
+						{% for product in discounted_product %}
+						<div class="col-sm-3">
+							<div class="thumb-wrapper">
+								<span class="wish-icon"><i class="fa fa-heart-o"></i></span>
+								<div class="img-box">
+									<img src="/media/{{product.image}}" class="img-fluid" 
+									alt="">									
+								</div>
+								<div class="thumb-content">
+									<a href={% url 'product_detail' product.id %}><h4>{{product.product_name}}</h4>	</a>
+															
+									<div class="star-rating">
+										<ul class="list-inline">
+											{{product.get_rating_stars}}
+										</ul>
+									</div>
+									<p class="item-price"><strike>{{product.sale_price}}</strike> <b>{{product.discounted_price}}</b></p>
+									
+									<button onclick="AddTOCart('{{product.id}}')" class="btn btn-danger">Add to cart</button>
+									{% check_in_userWishlist request.user.id product.id   as bookmark_object %}
+                                            {% if bookmark_object %}
+                                            <button class="like btn btn-default" style="color:red"  id="wishlist{{product.id}}" onclick="AddTOWIshList({{product.id}})" type="button"><span class="fa fa-heart" ></span></button>
+                                            {% else %}
+                                            <button class="like btn " style="color:green" id="wishlist{{product.id}}" onclick="Remove_from_WishList({{product.id}})" type="button"><span class="fa fa-heart" ></span></button>
+                                            {% endif %}
+								</div>						
+							</div>
+						</div>
+					
+						{% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
+								
+							</div>
+						</div>
+						<div class="item carousel-item">
+							<div class="row">
+						{% endif %}
+						{% endfor %}
+						
+					</div>
+				</div>
+				
+			</div>
+			<!-- Carousel controls -->
+			<a class="carousel-control-prev" href="#myCarousel" data-slide="prev">
+				<i class="fa fa-angle-left"></i>
+			</a>
+			<a class="carousel-control-next" href="#myCarousel" data-slide="next">
+				<i class="fa fa-angle-right"></i>
+			</a>
+		</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="container-xl mt-5">
+	<div class="row">
+		<div class="col-md-12">
+			<h2>All <b>Products</b></h2>
+			<div id="all_product" class="carousel slide" data-ride="carousel" data-interval="0">
+			<!-- Carousel indicators -->
+			<ol class="carousel-indicators">
+
+				<li data-target="#all_product" data-slide-to="0" class="active"></li>
+				{% for item in all_product|slice:"1:" %}
+                <li data-target="#all_product"  data-slide-to="{{forloop.counter}}"></li>
+
+                {%endfor%}
+				
+			</ol>   
+			<!-- Wrapper for carousel items -->
+			<div class="carousel-inner">
+				
+				<div class="item carousel-item active">
+					
+					<div class="row">
+					
+						{% for product in all_product %}
+						<div class="col-sm-3">
+							<div class="thumb-wrapper">
+								<span class="wish-icon"><i class="fa fa-heart-o"></i></span>
+								<div class="img-box">
+									<img src="/media/{{product.image}}" class="img-fluid" alt="">									
+								</div>
+								<div class="thumb-content">
+									<a href={% url 'product_detail' product.id %}><h4>{{product.product_name}}</h4>	</a>			
+									<div class="star-rating">
+										<ul class="list-inline">
+											{{product.get_rating_stars}}
+										</ul>
+									</div>
+									<p class="item-price"><strike>{{product.sale_price}}</strike> <b>{{product.discounted_price}}</b></p>
+									{% check_in_userWishlist request.user.id product.id   as bookmark_object %}
+                                            {% if bookmark_object %}
+                                            <button class="like btn btn-default" style="color:red"  id="wishlist{{product.id}}"  onclick="AddTOWIshList({{product.id}})" type="button"><span class="fa fa-heart" ></span></button>
+                                            {% else %}
+                                            <button class="like btn " style="color:green" id="wishlist{{product.id}}" onclick="Remove_from_WishList({{product.id}})" type="button"><span class="fa fa-heart" ></span></button>
+                                            {% endif %}
+											<button onclick="AddTOCart('{{product.id}}')" class="btn btn-danger">Add to cart</button>
+								</div>						
+							</div>
+						</div>
+					
+						{% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
+								
+							</div>
+						</div>
+						<div class="item carousel-item">
+							<div class="row">
+						{% endif %}
+						{% endfor %}
+						
+					</div>
+				</div>
+				
+			</div>
+			<!-- Carousel controls -->
+			<a class="carousel-control-prev" href="#all_product" data-slide="prev">
+				<i class="fa fa-angle-left"></i>
+			</a>
+			<a class="carousel-control-next" href="#all_product" data-slide="next">
+				<i class="fa fa-angle-right"></i>
+			</a>
+		</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script src={% static 'js/home.js' %}></script>
+
+{% endblock script %}

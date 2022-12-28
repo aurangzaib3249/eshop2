@@ -1,0 +1,255 @@
+{% extends 'BuyerBase.html' %}
+{% load custom_tags %}
+{% load static %}
+{% block style %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        rel="stylesheet"/>
+        <style>
+          input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+        </style>
+{% endblock %}
+{% block content %}
+  <section class="container-fluid">
+    <div class="container-fluid py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col">
+          <div class="card">
+            <div class="card-body p-4">
+              <div class="row">
+                <div class="col-lg-7">
+                  <h5 class="mb-3">
+                    <a href={% url 'buyer_products' %} class="text-body"><i class="fas fa-long-arrow-alt-left me-2"></i>Continue shopping</a>
+                  </h5>
+                  <hr />
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                      <p class="mb-1">Shopping cart</p>
+                      <p class="mb-0"></p>
+                    </div>
+                    <div></div>
+                  </div>
+                  {% for item in products %}
+                    <div class="row mb-4 d-flex justify-content-between align-items-center">
+                      <div class="col-md-2 col-lg-2 col-xl-2">
+                        <img src="/media/{{ item.image }}"
+                             class="img-fluid rounded-3"
+                             alt="Cotton T-shirt"/>
+                      </div>
+                      <div class="col-md-3 col-lg-3 col-xl-3">
+                        <h6 class="text-muted">{{ item.product_name }}</h6>
+                        <h6 class="text-black mb-0">{{ item.product_category }}</h6>
+                      </div>
+                      <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                        <button class="btn btn-link px-2">
+                                                    <a href={% url 'remove_single_item' item.id %}><i class="fas fa-minus"
+                             ></i></a>
+                        </button>
+                        <input id="form1"
+                               min="0"
+                               name="quantity"
+                               value="{{ request.session.product_list|get_product_qty:item.id }}"
+                               type="number"
+                               class="form-control form-control-sm"/>
+                        <button class="btn btn-link px-2">
+                          
+                          <a href={% url 'addCart' item.id %}>
+                          
+                          <i class="fas fa-plus " 
+                             ></i></a>
+                        </button>
+                      </div>
+                      <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                        <h6 class="mb-0">${{ request.session.product_list|get_order_item_price:item }}</h6>
+                      </div>
+                      <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                        <a href={% url 'remove_item' item.id %} class="text-muted"><i class="fas fa-times"></i></a>
+                      </div>
+                    </div>
+                  {% endfor %}
+                 
+                </div>
+                <div class="col-lg-5">
+                  <div class="card bg-info text-white rounded-3" style="height:100%;">
+                    <div class="card-body " style="margin-top: auto;">
+                      <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Card details</h5>
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp"
+                             class="img-fluid rounded-3"
+                             style="width: 45px;"
+                             alt="Avatar"/>
+                      </div>
+                      <script src="https://js.stripe.com/v3/"></script>
+                      <div class="new-card-form">
+                        <form action="" method="post" class="stripe-form" id="stripe-form">
+                          {% csrf_token %}
+                          <div class="stripe-form-row" id="creditCard">
+                            <label for="card-element" id="stripeBtnLabel">Credit or debit card</label>
+                            <div id="card-element" class="StripeElement StripeElement--empty">
+                              <div class="__PrivateStripeElement"
+                                   style="margin: 0px !important;
+                                          padding: 0px !important;
+                                          border: none !important;
+                                          display: block !important;
+                                          background: transparent !important;
+                                          position: relative !important;
+                                          opacity: 1 !important;">
+                                <iframe frameborder="0"
+                                        allowtransparency="true"
+                                        scrolling="no"
+                                        name="__privateStripeFrame5"
+                                        allowpaymentrequest="true"
+                                        src="https://js.stripe.com/v3/elements-inner-card-19066928f2ed1ba3ffada645e45f5b50.html#style[base][color]=%2332325d&amp;style[base][fontFamily]=%22Helvetica+Neue%22%2C+Helvetica%2C+sans-serif&amp;style[base][fontSmoothing]=antialiased&amp;style[base][fontSize]=16px&amp;style[base][::placeholder][color]=%23aab7c4&amp;style[invalid][color]=%23fa755a&amp;style[invalid][iconColor]=%23fa755a&amp;componentName=card&amp;wait=false&amp;rtl=false&amp;keyMode=test&amp;origin=https%3A%2F%2Fstripe.com&amp;referrer=https%3A%2F%2Fstripe.com%2Fdocs%2Fstripe-js&amp;controllerId=__privateStripeController1"
+                                        title="Secure payment input frame"
+                                        style="border: none !important;
+                                               margin: 0px !important;
+                                               padding: 0px !important;
+                                               width: 1px !important;
+                                               min-width: 100% !important;
+                                               overflow: hidden !important;
+                                               display: block !important;
+                                               height: 19.2px;"></iframe>
+                                <input class="__PrivateStripeElement-input"
+                                       aria-hidden="true"
+                                       aria-label=" "
+                                       autocomplete="false"
+                                       maxlength="1"
+                                       style="border: none !important;
+                                              display: block !important;
+                                              position: absolute !important;
+                                              height: 1px !important;
+                                              top: 0px !important;
+                                              left: 0px !important;
+                                              padding: 0px !important;
+                                              margin: 0px !important;
+                                              width: 100% !important;
+                                              opacity: 0 !important;
+                                              background: transparent !important;
+                                              pointer-events: none !important;
+                                              font-size: 16px !important;"/>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="d-flex justify-content-between mb-4">
+                            <p class="mb-2">Total(Incl. taxes)</p>
+                            <p class="mb-2">${{ sum }}</p>
+                          </div>
+                          <div class="stripe-form-row mt-5">
+                            <button type="submit" id="stripeBtn" class="btn btn-dark btn-block btn-lg">
+                              <div class="d-flex justify-content-between">
+                                <span>${{ sum }}</span>
+                                <span>Checkout <i class="fas fa-long-arrow-alt-right ms-2"></i></span>
+                              </div>
+                            </button>
+                          </div>
+                          <div id="card-errors" role="alert"></div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block script %}
+  <script nonce="">
+    // Create a Stripe client.
+    var stripe = Stripe('{{key}}')
+    // Create an instance of Elements.
+    var elements = stripe.elements()
+    // Custom styling can be passed to options when creating an Element.
+    // (Note that this demo uses a wider set of styles than the guide below.)
+    var style = {
+      base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#aab7c4'
+        }
+      },
+      invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+      }
+    }
+    // Create an instance of the card Element.
+    var card = elements.create('card', {
+      hidePostalCode: true,
+      style: style
+    })
+    // Add an instance of the card Element into the `card-element` <div>.
+    card.mount('#card-element')
+    // Handle real-time validation errors from the card Element.
+    card.addEventListener('change', function (event) {
+      var displayError = document.getElementById('card-errors')
+      if (event.error) {
+        displayError.textContent = event.error.message
+      } else {
+        displayError.textContent = ''
+      }
+    })
+    // Handle form submission.
+    var form = document.getElementById('stripe-form')
+    form.addEventListener('submit', function (event) {
+      event.preventDefault()
+      stripe.createToken(card).then(function (result) {
+        if (result.error) {
+          // Inform the user if there was an error.
+          var errorElement = document.getElementById('card-errors')
+          errorElement.textContent = result.error.message
+        } else {
+          // Send the token to your server.
+          stripeTokenHandler(result.token)
+        }
+      })
+    })
+    // Submit the form with the token ID.
+    function stripeTokenHandler(token) {
+      // Insert the token ID into the form so it gets submitted to the server
+      var form = document.getElementById('stripe-form')
+      var hiddenInput = document.createElement('input')
+      hiddenInput.setAttribute('type', 'hidden')
+      hiddenInput.setAttribute('name', 'stripeToken')
+      hiddenInput.setAttribute('value', token.id)
+      form.appendChild(hiddenInput)
+      // Submit the form
+      form.submit()
+    }
+    var currentCardForm = $('.current-card-form')
+    var newCardForm = $('.new-card-form')
+    var use_default_card = document.querySelector('input[name=use_default_card]')
+    use_default_card.addEventListener('change', function () {
+      if (this.checked) {
+        newCardForm.hide()
+        currentCardForm.show()
+      } else {
+        newCardForm.show()
+        currentCardForm.hide()
+      }
+    })
+    function stickyheaddsadaer(obj) {
+      if ($(obj).is(':checked')) {
+        console.log($('input[name=cardnumber]'))
+        alert($('input[name=cardnumber]').val()) //when checked
+        $('#page-header-inner').addClass('sticky')
+      } else {
+        alert('Not checked') //when not checked
+      }
+    }
+    function savePayment() {}
+  </script>
+ 
+{% endblock %}

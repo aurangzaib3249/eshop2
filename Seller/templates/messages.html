@@ -1,0 +1,16 @@
+
+{% if messages %}
+    {% for message in messages %}<script>
+    showMessage('{{ message.tags }}', ' {{ message }}')
+</script>{% endfor %}
+{% endif %}
+{% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}<script>
+    showMessage("error", ' {{ error|escape }}')
+</script>{% endfor %}
+    {% endfor %}
+{% endif %}
+{% for error in form.non_field_errors %}<script>
+    showMessage("error", ' {{ error|escape }}')
+</script>{% endfor %}

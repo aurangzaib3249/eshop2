@@ -1,0 +1,36 @@
+{% extends 'BuyerBase.html' %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href={% static 'css/profile.css' %}>
+
+{% endblock style %}
+{% block content %}
+
+<div class="signup-form">
+    <form action="" method="post" class="form-horizontal" >
+        {% csrf_token %}
+      	<div class="row">
+        	<div class="col-8 offset-4">
+				<h2>Profile</h2>
+			</div>	
+      	</div>	
+        {% for field in profile %}
+        
+        		
+        <div class="form-group row">
+			<label class="col-form-label col-4">{{field.label}}</label>
+			<div class="col-8">
+                {{field}}
+            </div>        	
+        </div>
+		{% endfor %}
+		<div class="form-group row">
+			<div class="col-8 offset-4">
+				<button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
+			</div>  
+		</div>		      
+    </form>
+	
+</div>
+
+{% endblock %}

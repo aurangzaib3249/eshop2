@@ -1,0 +1,26 @@
+{% if  status == None%}
+
+<span>Order was Completed from your side</span>
+<h3>{{cur}}</h3>
+
+{% else %}
+
+<div class="form-group container">
+    <label>Change Order Status</label>
+    <select name="order_status" class="form-control" placeholder="Select Status" required id="order_id">
+        <option value="" selected>---------</option>
+
+       {% for i in status %}
+       
+       {% if i  != cur %}
+       
+        <option value="{{i}}">{{i}}</option>
+       {% endif %}
+       
+       {% endfor %}
+
+        <input type="text" name="order_id" hidden id="order_id" value="{{order_id}}">
+
+</select>
+{% endif %}
+

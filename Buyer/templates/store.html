@@ -1,0 +1,56 @@
+{% extends 'BuyerBase.html' %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href={% static 'css/profile.css' %}>
+
+{% endblock style %}
+{% block content %}
+{% if form.errors %}
+    {% for field in form %}
+    {% for error in field.errors %}
+    <script>
+        showMessage("error",' {{ error|escape }}')
+    </script>
+    {% endfor %}
+{% endfor %}
+{% endif %}
+{% for error in form.non_field_errors %}
+<script>
+    showMessage("error",' {{ error|escape }}')
+</script>
+{% endfor %}
+<div class="signup-form">
+    <form action="" method="post" class="form-horizontal" >
+        {% csrf_token %}
+      	<div class="row">
+        	<div class="col-8 offset-4">
+				<h2>Store</h2>
+			</div>	
+      	</div>	
+        {% for field in form.visible_fields %}
+		
+		
+	
+	
+        <div class="form-group row">
+			<label class="col-form-label col-4">{{field.label}}</label>
+			<div class="col-8">
+                {{field}}
+            </div>        	
+        </div>
+		
+		{% endfor %}
+
+        {% for field in form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
+		<div class="form-group row">
+			<div class="col-8 offset-4">
+				<button type="submit" class="btn btn-primary btn-lg">Open My Store</button>
+			</div>  
+		</div>		      
+    </form>
+	
+</div>
+
+{% endblock %}
